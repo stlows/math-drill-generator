@@ -1,0 +1,15 @@
+table {
+  border-collapse: collapse;
+}
+td {
+  padding: 15px;
+}
+table td {
+  border: 1px solid #ccc;
+}
+td.question {
+  text-align: right;
+}
+td.answer {
+  width: 100px;
+}

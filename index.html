@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+  <title>Générateur d'exercices arithmétiques</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div id="app">
+    <v-app>
+      <v-main>
+        <v-container>
+          <div class="text-right">Créé par <a href="https://vbeaulieu.com">Vincent Beaulieu</a></div>
+        </v-container>
+        <header class="text-center">
+          <h1 class="text-h4 my-6">Générateur d'exercices arithmétiques</h1>
+        </header>
+        <v-card class="content pa-12 mx-auto" max-width="900">
+          <v-expansion-panels class="mb-6">
+            <v-expansion-panel>
+              <v-expansion-panel-header>
+                Paramètres d'exercices...
+              </v-expansion-panel-header>
+              <v-expansion-panel-content>
+                <v-row class="mb-3">
+                  <v-col cols="12" md="6">
+                    <h3>Nombre 1</h3>
+                    <p class="text-caption">Nombre de gauche pour addition, multiplication et soustraction. Facteur (et
+                      réponse) pour division.</p>
+                    <v-btn @click="selectAllNumbers(0)" color="primary" text class="mr-3">Tous</v-btn>
+                    <v-btn @click="unselectAllNumbers(0)" color="error" text>Aucun</v-btn>
+
+                    <v-btn-toggle v-model="numbers[0]" multiple v-for="i in settings.numbers[0]" :key="'number1row' + i"
+                      color="primary" tile group>
+                      <v-btn v-for="x in 5" :value="x + i * 5 - 5" :key="'number1row' + i + 'col' + x">
+                        {{x + i * 5 - 5}}
+                      </v-btn>
+                    </v-btn-toggle>
+                    <v-btn tile text color="primary" @click="$set(settings.numbers, 0, settings.numbers[0] + 2)">Plus...
+                    </v-btn>
+
+                  </v-col>
+                  <v-col cols="12" md="6">
+                    <h3>Nombre 2</h3>
+                    <p class="text-caption">Nombre de droite pour addition, multiplication et soustraction. Diviseur
+                      pour division.</p>
+                    <v-btn @click="selectAllNumbers(1)" color="primary" text class="mr-3">Tous</v-btn>
+                    <v-btn @click="unselectAllNumbers(1)" color="error" text>Aucun</v-btn>
+
+                    <v-btn-toggle v-model="numbers[1]" multiple v-for="i in settings.numbers[1]" :key="'number2row' + i"
+                      color="primary" tile group>
+                      <v-btn v-for="x in 5" :value="x + i * 5 - 5" :key="'number2row' + i + 'col' + x">
+                        {{x + i * 5 - 5}}
+                      </v-btn>
+                    </v-btn-toggle>
+                    <v-btn tile text color="primary" @click="$set(settings.numbers, 1, settings.numbers[1] + 2)">Plus...
+                    </v-btn>
+                  </v-col>
+                </v-row>
+
+                <div class="mb-3">
+                  <h3>Opérandes</h3>
+                  <v-btn-toggle v-model="operands" multiple mandatory color="primary" tile group>
+                    <v-btn v-for="operand in settings.operands" :key="operand" :value="operand">
+                      {{operand}}
+                    </v-btn>
+                  </v-btn-toggle>
+                </div>
+
+                <div>
+                  <h3>{{numberOfQuestion}} questions</h3>
+                  <v-slider max="100" min="10" v-model="numberOfQuestion" step="2"></v-slider>
+                </div>
+                <div>
+                  <v-checkbox label="Permettre les réponses négatives" v-model="allowNegativeAnswer"></v-checkbox>
+                </div>
+
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+          </v-expansion-panels>
+          <div class="text-center">
+            <v-btn @click="generate" class="primary" large>Générer les exercices</v-btn>
+          </div>
+          <v-alert v-show="erreurSoustraction" type="error" text border="left" class="my-3">Aucune soustraction
+            possible.
+            Permettre
+            les négatifs ou
+            ajuster les
+            nombres.</v-alert>
+          <v-alert v-show="erreurNombresVides" type="error" text border="left" class="my-3">Choisir au moins un nombre
+            pour Nombre 1 et Nombre 2.</v-alert>
+          <v-alert v-show="erreurOperandesVides" type="error" text border="left" class="my-3">Choisir au moins une
+            opérande.</v-alert>
+          <div class="" v-show="showExercices">
+            <v-expansion-panels class="my-6">
+              <v-expansion-panel>
+                <v-expansion-panel-header>
+                  Paramètres d'affichage...
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                  <div>
+                    <h3>{{settings.colonnes}} colonnes</h3>
+                    <v-slider max="4" min="1" v-model="settings.colonnes" hide-details></v-slider>
+                  </div>
+                  <div>
+                    <v-checkbox label="Afficher les réponses" v-model="settings.afficherReponses"></v-checkbox>
+                  </div>
+                  <div class="text-center my-3">
+                    <v-text-field label="Titre du document" outlined v-model="settings.titreDocument" class="mr-6">
+                    </v-text-field>
+                    <v-btn @click="pdf" color="primary" text>Exporter</v-btn>
+                  </div>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+            </v-expansion-panels>
+
+
+            <div class="text-center my-6" id="exercices">
+              <h2 class="mb-3 text-h5">{{settings.titreDocument}}</h2>
+              <div class="mx-auto">
+                <table class="d-inline-block">
+                  <tr v-for="i in Math.ceil(results.length / settings.colonnes)">
+                    <template v-for="c in settings.colonnes"
+                      v-if="settings.colonnes * (i - 1) + (c - 1) < results.length">
+                      <td class="question">{{results[settings.colonnes * (i - 1) + (c - 1)].q}}</td>
+                      <td class="answer"><span v-if="settings.afficherReponses">{{results[settings.colonnes * (i - 1) +
+                          (c
+                          -
+                          1)].a}}</span></td>
+                    </template>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        </v-card>
+      </v-main>
+    </v-app>
+
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+  <script src="script.js"></script>
+</body>
+
+</html>
