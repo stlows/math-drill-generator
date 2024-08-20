@@ -22,7 +22,7 @@
         <header class="text-center">
           <h1 class="text-h4 my-6">Générateur d'exercices arithmétiques</h1>
         </header>
-        <v-card class="content pa-12 mx-auto" max-width="900">
+        <v-card class="content pa-2 mx-auto" max-width="700" flat>
           <v-expansion-panels class="mb-6">
             <v-expansion-panel>
               <v-expansion-panel-header>
@@ -37,8 +37,7 @@
                     <v-btn @click="selectAllNumbers(0)" color="primary" text class="mr-3">Tous</v-btn>
                     <v-btn @click="unselectAllNumbers(0)" color="error" text>Aucun</v-btn>
 
-                    <v-btn-toggle v-model="numbers[0]" multiple v-for="i in settings.numbers[0]" :key="'number1row' + i"
-                      color="primary" tile group>
+                    <v-btn-toggle v-model="numbers[0]" multiple v-for="i in settings.numbers[0]" :key="'number1row' + i" color="primary" tile group>
                       <v-btn v-for="x in 5" :value="x + i * 5 - 5" :key="'number1row' + i + 'col' + x">
                         {{x + i * 5 - 5}}
                       </v-btn>
@@ -54,8 +53,7 @@
                     <v-btn @click="selectAllNumbers(1)" color="primary" text class="mr-3">Tous</v-btn>
                     <v-btn @click="unselectAllNumbers(1)" color="error" text>Aucun</v-btn>
 
-                    <v-btn-toggle v-model="numbers[1]" multiple v-for="i in settings.numbers[1]" :key="'number2row' + i"
-                      color="primary" tile group>
+                    <v-btn-toggle v-model="numbers[1]" multiple v-for="i in settings.numbers[1]" :key="'number2row' + i" color="primary" tile group>
                       <v-btn v-for="x in 5" :value="x + i * 5 - 5" :key="'number2row' + i + 'col' + x">
                         {{x + i * 5 - 5}}
                       </v-btn>
@@ -86,7 +84,7 @@
             </v-expansion-panel>
           </v-expansion-panels>
           <div class="text-center">
-            <v-btn @click="generate" class="primary" large>Générer les exercices</v-btn>
+            <v-btn @click="generate" class="primary" x-large>Générer les exercices</v-btn>
           </div>
           <v-alert v-show="erreurSoustraction" type="error" text border="left" class="my-3">Aucune soustraction
             possible.
@@ -127,8 +125,7 @@
               <div class="mx-auto">
                 <table class="d-inline-block">
                   <tr v-for="i in Math.ceil(results.length / settings.colonnes)">
-                    <template v-for="c in settings.colonnes"
-                      v-if="settings.colonnes * (i - 1) + (c - 1) < results.length">
+                    <template v-for="c in settings.colonnes" v-if="settings.colonnes * (i - 1) + (c - 1) < results.length">
                       <td class="question">{{results[settings.colonnes * (i - 1) + (c - 1)].q}}</td>
                       <td class="answer"><span v-if="settings.afficherReponses">{{results[settings.colonnes * (i - 1) +
                           (c
