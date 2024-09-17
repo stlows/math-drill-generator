@@ -79,6 +79,9 @@
                 <div>
                   <v-checkbox label="Permettre les réponses négatives" v-model="allowNegativeAnswer"></v-checkbox>
                 </div>
+                <div>
+                  <v-checkbox label="Éviter les doublons" v-model="noDuplicates"></v-checkbox>
+                </div>
 
               </v-expansion-panel-content>
             </v-expansion-panel>
@@ -96,11 +99,12 @@
             pour Nombre 1 et Nombre 2.</v-alert>
           <v-alert v-show="erreurOperandesVides" type="error" text border="left" class="my-3">Choisir au moins une
             opérande.</v-alert>
+          <v-alert v-show="erreurMaximumAttemptsWithoutDuplicates" type="error" text border="left" class="my-3">Impossible de trouver {{numberOfQuestion}} exercices sans autoriser les doublons avec les paramètres fournis.</v-alert>
           <div class="" v-show="showExercices">
             <v-expansion-panels class="my-6">
               <v-expansion-panel>
                 <v-expansion-panel-header>
-                  Paramètres d'affichage...
+                  Paramètres d'affichage et exporter...
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
                   <div>
@@ -135,6 +139,16 @@
                   </tr>
                 </table>
               </div>
+              <div class="text-left text-caption">
+                <p class="text-small mb-0">Nombre 1: {{numbers[0]}}</p>
+                <p class="text-small mb-0">Nombre 2: {{numbers[1]}}</p>
+                <p class="text-small mb-0">Opérandes: {{operands}}</p>
+                <p class="text-small mb-0">Nombre de questions: {{numberOfQuestion}}</p>
+                <p class="text-small mb-0">Réponses négatives: {{allowNegativeAnswer ? "Oui" : "Non"}}</p>
+                <p class="text-small mb-0">Éviter les doublons: {{noDuplicates ? "Oui" : "Non"}}</p>
+
+              </div>
+
             </div>
           </div>
         </v-card>
